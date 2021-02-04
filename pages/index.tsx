@@ -70,7 +70,8 @@ const IndexPage = (): JSX.Element => {
   const [search, setSearch] = useState<string>(q);
   useEffect(() => {
     const handler = setTimeout(() => {
-      if (search !== q) push(`/?q=${search}&page=1`);
+      if (search !== q)
+        push(`/?q=${search}&page=1`, undefined, { shallow: true });
     }, 500);
 
     return () => {
@@ -79,7 +80,7 @@ const IndexPage = (): JSX.Element => {
   }, [search, q]); // eslint-disable-line
   const setPage = useCallback(
     (page) => {
-      router.push(`/?q=${q}&page=${page}`);
+      router.push(`/?q=${q}&page=${page}`, undefined, { shallow: true });
     },
     [q, page] // eslint-disable-line
   );
