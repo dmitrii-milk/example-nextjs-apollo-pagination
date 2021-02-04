@@ -1,25 +1,28 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 import {
   ApolloClient,
   HttpLink,
   InMemoryCache,
   NormalizedCacheObject,
-} from "@apollo/client";
+} from '@apollo/client';
 
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 
-function createApolloClient() {
+function createApolloClient(): ApolloClient<NormalizedCacheObject> {
   return new ApolloClient({
-    ssrMode: typeof window === "undefined",
+    ssrMode: typeof window === 'undefined',
     link: new HttpLink({
-      uri: "https://graphqlzero.almansi.me/api",
+      uri: 'https://graphqlzero.almansi.me/api',
     }),
     cache: new InMemoryCache(),
   });
 }
 
-export function initializeApollo(initialState: any = null) {
+export function initializeApollo(
+  initialState: NormalizedCacheObject | null = null
+): ApolloClient<NormalizedCacheObject> {
   const _apolloClient = apolloClient ?? createApolloClient();
+  console.log(initialState);
 
   // If your page has Next.js data fetching methods that use Apollo Client, the initial state
   // gets hydrated here
@@ -31,13 +34,15 @@ export function initializeApollo(initialState: any = null) {
     _apolloClient.cache.restore({ ...existingCache, ...initialState });
   }
   // For SSG and SSR always create a new Apollo Client
-  if (typeof window === "undefined") return _apolloClient;
+  if (typeof window === 'undefined') return _apolloClient;
   // Create the Apollo Client once in the client
   if (!apolloClient) apolloClient = _apolloClient;
   return _apolloClient;
 }
 
-export function useApollo(initialState: any) {
+export function useApollo(
+  initialState: NormalizedCacheObject
+): ApolloClient<NormalizedCacheObject> {
   const store = useMemo(() => initializeApollo(initialState), [initialState]);
   return store;
 }

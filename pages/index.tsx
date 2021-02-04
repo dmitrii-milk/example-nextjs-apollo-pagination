@@ -56,8 +56,9 @@ export const GET_PHOTOS_QUERY = gql`
   }
 `;
 
-const IndexPage = () => {
+const IndexPage = (): JSX.Element => {
   const router = useRouter();
+  const push = router.push;
   const q: string =
     router?.query?.q && typeof router.query.q === 'string'
       ? router.query.q
@@ -69,18 +70,18 @@ const IndexPage = () => {
   const [search, setSearch] = useState<string>(q);
   useEffect(() => {
     const handler = setTimeout(() => {
-      router.push(`/?q=${search}&page=1`);
+      if (search !== q) push(`/?q=${search}&page=1`);
     }, 500);
 
     return () => {
       clearTimeout(handler);
     };
-  }, [search]);
+  }, [search, q]); // eslint-disable-line
   const setPage = useCallback(
     (page) => {
       router.push(`/?q=${q}&page=${page}`);
     },
-    [search, q]
+    [q, page] // eslint-disable-line
   );
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
@@ -211,6 +212,7 @@ const IndexPage = () => {
   );
 };
 
+// eslint-disable-next-line
 export async function getServerSideProps(context: any) {
   const apolloClient = initializeApollo();
 
@@ -235,25 +237,5 @@ export async function getServerSideProps(context: any) {
     },
   };
 }
-
-// export async function getStaticProps() {
-//   const apolloClient = initializeApollo();
-
-//   await apolloClient.query({
-//     query: GET_PHOTOS_QUERY,
-//     variables: {
-//       q: '',
-//       page: 1,
-//       limit: LIST_LIMIT,
-//     },
-//   });
-
-//   return {
-//     props: {
-//       initialApolloState: apolloClient.cache.extract(),
-//     },
-//     revalidate: 1,
-//   };
-// }
 
 export default IndexPage;
